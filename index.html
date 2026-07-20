@@ -126,11 +126,18 @@
 
     .day-header {
       display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      width: 100%;
+      margin-bottom: 2px;
+      line-height: 1.1;
+    }
+
+    .day-top-row {
+      display: flex;
       justify-content: space-between;
       align-items: center;
       width: 100%;
-      height: 16px;
-      margin-bottom: 2px;
     }
 
     .day-num {
@@ -149,8 +156,8 @@
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-      max-width: 26px; 
-      text-align: right;
+      width: 100%;
+      text-align: left;
     }
 
     .comment-indicator {
@@ -273,7 +280,7 @@
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-  import { getFirestore, doc, onSnapshot, setDoc, deleteDoc, collection, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+  import { getFirestore, doc, onSnapshot, setDoc, deleteDoc, collection } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyAYR3n7-EvEv5ue6sAFX-lcSTeHZBP7MQo",
@@ -287,14 +294,13 @@
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
 
-  // 初期ラベル（Firebaseに保存されるまでのデフォルト）
-  let scheduleMeta = {
-    type1: { className: 'bg-type1', label: '予定1' },
-    type2: { className: 'bg-type2', label: '予定2' },
-    type3: { className: 'bg-type3', label: '予定3' },
-    type4: { className: 'bg-type4', label: '予定4' },
-    type5: { className: 'bg-type5', label: '予定5' },
-    type6: { className: 'bg-type6', label: '予定6' }
+  const scheduleMeta = {
+    type1: { className: 'bg-type1', label: localStorage.getItem('label-type1') || '予定1' },
+    type2: { className: 'bg-type2', label: localStorage.getItem('label-type2') || '予定2' },
+    type3: { className: 'bg-type3', label: localStorage.getItem('label-type3') || '予定3' },
+    type4: { className: 'bg-type4', label: localStorage.getItem('label-type4') || '予定4' },
+    type5: { className: 'bg-type5', label: localStorage.getItem('label-type5') || '予定5' },
+    type6: { className: 'bg-type6', label: localStorage.getItem('label-type6') || '予定6' }
   };
 
   function updateButtonLabels() {
@@ -378,10 +384,14 @@
       const dateKey = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
       
       let cellHTML = `<div class="day-header">`;
+      cellHTML += `<div class="day-top-row">`;
       cellHTML += `<div class="day-num">${day}</div>`;
-      if (holidayName) cellHTML += `<div class="holiday-name">${holidayName}</div>`;
       if (savedData[dateKey] && savedData[dateKey].comment) {
         cellHTML += `<div class="comment-indicator">💬</div>`;
+      }
+      cellHTML += `</div>`;
+      if (holidayName) {
+        cellHTML += `<div class="holiday-name">${holidayName}</div>`;
       }
       cellHTML += `</div>`;
       cellHTML += `<div class="badge-container"></div>`;
@@ -470,20 +480,6 @@
     }
   }
 
-  // Firebaseからラベルの同期を取得
-  onSnapshot(doc(db, "settings", "labels"), (docSnap) => {
-    if (docSnap.exists()) {
-      const data = docSnap.data();
-      Object.keys(scheduleMeta).forEach(key => {
-        if (data[key]) {
-          scheduleMeta[key].label = data[key];
-        }
-      });
-      updateButtonLabels();
-      renderCalendar();
-    }
-  });
-
   try {
     onSnapshot(collection(db, "schedules"), (snapshot) => {
       savedData = {}; 
@@ -528,22 +524,16 @@
       currentType = type;
     });
 
-    btn.addEventListener('dblclick', async (e) => {
+    btn.addEventListener('dblclick', (e) => {
       e.stopPropagation();
       const currentName = scheduleMeta[type].label;
       const newName = prompt(`「${currentName}」の新しい項目名を入力してください：`, currentName);
       
       if (newName && newName.trim() !== "") {
-        scheduleMeta[type].label = newName.trim();             
-        updateButtonLabels();                                 
-        renderCalendar();                                     
-
-        // Firebaseに新しいラベル名を保存（これで家族全員に共有される）
-        const labelsToSave = {};
-        Object.keys(scheduleMeta).forEach(k => {
-          labelsToSave[k] = scheduleMeta[k].label;
-        });
-        await setDoc(doc(db, "settings", "labels"), labelsToSave);
+        scheduleMeta[type].label = newName;             
+        localStorage.setItem(`label-${type}`, newName); 
+        updateButtonLabels();                           
+        renderCalendar();                               
       }
     });
   });
