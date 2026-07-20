@@ -126,19 +126,11 @@
 
     .day-header {
       display: flex;
-      flex-direction: column;
-      align-items: flex-start;
-      width: 100%;
-      margin-bottom: 2px;
-      line-height: 1.1;
-      pointer-events: none; /* クリック判定がセル全体に確実に行くようにする */
-    }
-
-    .day-top-row {
-      display: flex;
       justify-content: space-between;
       align-items: center;
       width: 100%;
+      height: 16px;
+      margin-bottom: 2px;
     }
 
     .day-num {
@@ -157,8 +149,8 @@
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-      width: 100%;
-      text-align: left;
+      max-width: 26px; 
+      text-align: right;
     }
 
     .comment-indicator {
@@ -172,7 +164,6 @@
       display: flex;
       flex-direction: column;
       gap: 1px;
-      pointer-events: none; /* クリック判定をセルに通す */
     }
 
     .badge {
@@ -386,14 +377,10 @@
       const dateKey = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
       
       let cellHTML = `<div class="day-header">`;
-      cellHTML += `<div class="day-top-row">`;
       cellHTML += `<div class="day-num">${day}</div>`;
+      if (holidayName) cellHTML += `<div class="holiday-name">${holidayName}</div>`;
       if (savedData[dateKey] && savedData[dateKey].comment) {
         cellHTML += `<div class="comment-indicator">💬</div>`;
-      }
-      cellHTML += `</div>`;
-      if (holidayName) {
-        cellHTML += `<div class="holiday-name">${holidayName}</div>`;
       }
       cellHTML += `</div>`;
       cellHTML += `<div class="badge-container"></div>`;
