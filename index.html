@@ -5,12 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>家族カレンダー</title>
   
-  <!-- スマホでアプリらしく見せるための設定 -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   
   <style>
-    /* 全体のリセット */
     * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-touch-callout: none; }
     body {
       background: #f0f2f5;
@@ -22,7 +20,6 @@
       padding: 10px;
     }
 
-    /* スマホサイズコンテナ */
     .app-container {
       width: 100%;
       max-width: 360px;
@@ -32,11 +29,10 @@
       overflow: hidden;
       display: flex;
       flex-direction: column;
-      height: 620px; /* 項目が増えたため高さを少し調整 */
+      height: 620px;
       position: relative;
     }
 
-    /* 月切り替え付きヘッダー */
     .header {
       display: flex;
       justify-content: space-between;
@@ -70,7 +66,6 @@
       background: #e4e6eb;
     }
 
-    /* カレンダーエリア */
     .calendar-container {
       flex: 1;
       display: flex;
@@ -107,10 +102,10 @@
       padding: 4px;
       display: flex;
       flex-direction: column;
-      justify-content: space-between;
+      justify-content: flex-start;
       cursor: pointer;
       position: relative;
-      height: 68px; /* 3つ表示用に少し縦幅を拡大 */
+      height: 68px;
       border: 2px solid transparent;
     }
     .day-cell.empty {
@@ -118,7 +113,6 @@
       cursor: default;
     }
     
-    /* ✨ 今日のおすすめハイライトデザイン */
     .day-cell.today {
       background: #fff9db;
       border-color: #fcc419;
@@ -130,34 +124,38 @@
       padding: 0 4px;
     }
 
+    .day-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+      height: 16px;
+      margin-bottom: 2px;
+    }
+
     .day-num {
       font-size: 11px;
       font-weight: 600;
       color: #333;
-      display: inline-block;
     }
     .day-cell.sunday .day-num { color: #dc3545; }
     .day-cell.saturday .day-num { color: #007bff; }
     .day-cell.holiday .day-num { color: #dc3545; }
 
     .holiday-name {
-      font-size: 7px;
+      font-size: 8px;
       color: #dc3545;
-      overflow: hidden;
-      white-space: nowrap;
-      text-overflow: ellipsis;
-      position: absolute;
-      top: 4px;
-      right: 16px; /* コメントマークと重ならないように調整 */
       font-weight: bold;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 26px; 
+      text-align: right;
     }
 
-    /* 💬 コメントがある時の小さいマーク */
     .comment-indicator {
-      position: absolute;
-      top: 4px;
-      right: 4px;
       font-size: 9px;
+      line-height: 1;
     }
 
     .badge-container {
@@ -165,7 +163,7 @@
       margin-top: auto;
       display: flex;
       flex-direction: column;
-      gap: 1px; /* 3つ綺麗に並ぶスキマ */
+      gap: 1px;
     }
 
     .badge {
@@ -182,7 +180,6 @@
       display: block;
     }
 
-    /* 🎨 6つの予定用のカラーバリエーション */
     .bg-type1 { background-color: #007bff; }
     .bg-type2 { background-color: #28a745; }
     .bg-type3 { background-color: #dc3545; }
@@ -190,7 +187,6 @@
     .bg-type5 { background-color: #6f42c1; }
     .bg-type6 { background-color: #17a2b8; }
 
-    /* 下部：アイコン選択エリア（6個用に2列配置に変更） */
     .dock {
       background: #f8f9fa;
       border-top: 1px solid #eee;
@@ -253,7 +249,6 @@
     <div class="days-grid" id="daysGrid"></div>
   </div>
 
-  <!-- 🔒 デフォルト「予定1〜6」にパワーアップ -->
   <div class="dock">
     <button class="icon-btn active" data-type="type1">
       <div class="dot bg-type1"></div><span>予定1</span>
@@ -278,22 +273,20 @@
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-  import { getFirestore, doc, onSnapshot, setDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-  import { collection } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+  import { getFirestore, doc, onSnapshot, setDoc, deleteDoc, collection } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-const firebaseConfig = {
-  apiKey: "AIzaSyArA9kbVhaPXpxLso_k_OYSGiUJrbVNaLI",
-  authDomain: "family-calendar-8bc65.firebaseapp.com",
-  projectId: "family-calendar-8bc65",
-  storageBucket: "family-calendar-8bc65.firebasestorage.app",
-  messagingSenderId: "530823961982",
-  appId: "1:530823961982:web:229f8308fb2a083a65e72f"
-};
+  const firebaseConfig = {
+    apiKey: "AIzaSyAYR3n7-EvEv5ue6sAFX-lcSTeHZBP7MQo",
+    authDomain: "family-calendar-new.firebaseapp.com",
+    projectId: "family-calendar-new",
+    storageBucket: "family-calendar-new.firebasestorage.app",
+    messagingSenderId: "667447037724",
+    appId: "1:667447037724:web:395d1b7dfc9a62ed08b4d9"
+  };
 
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
 
-  // 🔐 6つの予定をスマホ本体に記憶させる設定
   const scheduleMeta = {
     type1: { className: 'bg-type1', label: localStorage.getItem('label-type1') || '予定1' },
     type2: { className: 'bg-type2', label: localStorage.getItem('label-type2') || '予定2' },
@@ -312,9 +305,8 @@ const firebaseConfig = {
 
   let currentDate = new Date();
   let currentType = 'type1';
-  let savedData = {}; // 予定とコメントを統合して管理
+  let savedData = {}; 
 
-  // 祝日判定
   function getHolidayName(year, month, day) {
     const m = month + 1;
     if (m === 1 && day === 1) return '元日';
@@ -343,14 +335,18 @@ const firebaseConfig = {
     return null;
   }
 
-  // カレンダー画面を描画する処理
   function renderCalendar() {
     const year = currentDate.getFullYear();
     const month = currentDate.getMonth();
     const today = new Date();
 
-    document.getElementById('monthTitle').innerText = `${year}年 ${month + 1}月`;
+    const titleEl = document.getElementById('monthTitle');
+    if (titleEl) {
+      titleEl.innerText = `${year}年 ${month + 1}月`;
+    }
+
     const daysGrid = document.getElementById('daysGrid');
+    if (!daysGrid) return;
     daysGrid.innerHTML = '';
 
     const firstDayIndex = new Date(year, month, 1).getDay();
@@ -370,7 +366,6 @@ const firebaseConfig = {
       const dayOfWeek = dateObj.getDay();
       const holidayName = getHolidayName(year, month, day);
 
-      // ✨ 今日かどうかの判定
       if (year === today.getFullYear() && month === today.getMonth() && day === today.getDate()) {
         cell.classList.add('today');
       }
@@ -379,49 +374,45 @@ const firebaseConfig = {
       if (dayOfWeek === 6) cell.classList.add('saturday');
       if (holidayName) cell.classList.add('holiday');
 
-      let cellHTML = `<div class="day-num">${day}</div>`;
-      if (holidayName) cellHTML += `<div class="holiday-name">${holidayName}</div>`;
-      
       const dateKey = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
       
-      // 💬 コメントが入っている場合は小さい「💬マーク」を表示
+      let cellHTML = `<div class="day-header">`;
+      cellHTML += `<div class="day-num">${day}</div>`;
+      if (holidayName) cellHTML += `<div class="holiday-name">${holidayName}</div>`;
       if (savedData[dateKey] && savedData[dateKey].comment) {
         cellHTML += `<div class="comment-indicator">💬</div>`;
       }
-      
+      cellHTML += `</div>`;
       cellHTML += `<div class="badge-container"></div>`;
       cell.innerHTML = cellHTML;
 
       const container = cell.querySelector('.badge-container');
       const dayEvents = (savedData[dateKey] && savedData[dateKey].types) ? savedData[dateKey].types : [];
      
-      // 🔄 1日最大3つの予定バッジを表示
       dayEvents.slice(0, 3).forEach(type => {
-        // 古いデータ名(kotonoha等)の互換性ケア
-        let mappedType = type;
-        if (type === 'kotonoha') mappedType = 'type1';
-        if (type === 'aiai') mappedType = 'type2';
-        if (type === 'yasumi') mappedType = 'type3';
-
-        if(scheduleMeta[mappedType]) {
+        if(scheduleMeta[type]) {
           const badge = document.createElement('div');
-          badge.className = `badge ${scheduleMeta[mappedType].className}`;
-          badge.innerText = scheduleMeta[mappedType].label;
+          badge.className = `badge ${scheduleMeta[type].className}`;
+          badge.innerText = scheduleMeta[type].label;
           container.appendChild(badge);
         }
       });
 
-      // 🔘 通常タップ時の処理：予定の付け外し（最大3個まで）
       cell.addEventListener('click', async () => {
         const docRef = doc(db, "schedules", dateKey);
-        let currentTypes = (savedData[dateKey] && savedData[dateKey].types) ? [...savedData[dateKey].types] : [];
-        let currentComment = (savedData[dateKey] && savedData[dateKey].comment) ? savedData[dateKey].comment : "";
+        let currentTypes = [];
+        let currentComment = "";
+
+        if (savedData[dateKey]) {
+          if (Array.isArray(savedData[dateKey].types)) {
+            currentTypes = [...savedData[dateKey].types];
+          }
+          currentComment = savedData[dateKey].comment || "";
+        }
 
         if (currentTypes.includes(currentType)) {
-          // すでに存在すれば削除
           currentTypes = currentTypes.filter(t => t !== currentType);
         } else {
-          // 3つ未満なら新しく追加
           if (currentTypes.length < 3) {
             currentTypes.push(currentType);
           } else {
@@ -433,16 +424,15 @@ const firebaseConfig = {
         if (currentTypes.length === 0 && currentComment === "") {
           await deleteDoc(docRef);
         } else {
-          await setDoc(docRef, { types: currentTypes, comment: currentComment }, { merge: true });
+          await setDoc(docRef, { types: currentTypes, comment: currentComment });
         }
       });
 
-      // 💬 長押し判定の仕組み（スマホ＆PC対応）
       let pressTimer;
       const startPress = () => {
         pressTimer = setTimeout(() => {
           openCommentModal(dateKey);
-        }, 750); // 0.75秒長押しでコメント画面へ
+        }, 750);
       };
       const cancelPress = () => { clearTimeout(pressTimer); };
 
@@ -456,33 +446,51 @@ const firebaseConfig = {
     }
   }
 
-  // 📝 コメントを入れる用のポップアップを開く関数
   async function openCommentModal(dateKey) {
-    const currentComment = (savedData[dateKey] && savedData[dateKey].comment) ? savedData[dateKey].comment : "";
+    let currentComment = "";
+    let currentTypes = [];
+
+    if (savedData[dateKey]) {
+      currentComment = savedData[dateKey].comment || "";
+      if (Array.isArray(savedData[dateKey].types)) {
+        currentTypes = savedData[dateKey].types;
+      }
+    }
+
     const newComment = prompt("この日のメモ・コメントを入力してください:\n(空欄にして確定すると削除されます)", currentComment);
     
     if (newComment !== null) {
       const docRef = doc(db, "schedules", dateKey);
-      let currentTypes = (savedData[dateKey] && savedData[dateKey].types) ? savedData[dateKey].types : [];
-      
       if (currentTypes.length === 0 && newComment.trim() === "") {
         await deleteDoc(docRef);
       } else {
-        await setDoc(docRef, { types: currentTypes, comment: newComment.trim() }, { merge: true });
+        await setDoc(docRef, { types: currentTypes, comment: newComment.trim() });
       }
     }
   }
 
-  // 🔄 Firebaseリアルタイム同期
-  onSnapshot(collection(db, "schedules"), (snapshot) => {
-    savedData = {}; 
-    snapshot.forEach((doc) => {
-      savedData[doc.id] = doc.data(); 
+  try {
+    onSnapshot(collection(db, "schedules"), (snapshot) => {
+      savedData = {}; 
+      snapshot.forEach((doc) => {
+        const data = doc.data();
+        if (data.type && !data.types) {
+          let oldType = data.type;
+          if (oldType === 'kotonoha') oldType = 'type1';
+          if (oldType === 'aiai') oldType = 'type2';
+          if (oldType === 'yasumi') oldType = 'type3';
+          data.types = [oldType];
+        }
+        savedData[doc.id] = data; 
+      });
+      renderCalendar(); 
+    }, (error) => {
+      renderCalendar();
     });
-    renderCalendar(); 
-  });
+  } catch(e) {
+    renderCalendar();
+  }
 
-  // 🔘 ボタン制御の初期設定
   updateButtonLabels();
 
   document.getElementById('prevMonth').addEventListener('click', () => {
