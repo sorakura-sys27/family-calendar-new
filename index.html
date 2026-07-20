@@ -11,7 +11,7 @@
   
   <style>
     /* 全体のリセット */
-    * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
+    * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-touch-callout: none; }
     body {
       background: #f0f2f5;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -32,7 +32,7 @@
       overflow: hidden;
       display: flex;
       flex-direction: column;
-      height: 580px;
+      height: 620px; /* 項目が増えたため高さを少し調整 */
       position: relative;
     }
 
@@ -110,20 +110,31 @@
       justify-content: space-between;
       cursor: pointer;
       position: relative;
-      height: 62px;
+      height: 68px; /* 3つ表示用に少し縦幅を拡大 */
+      border: 2px solid transparent;
     }
     .day-cell.empty {
       background: transparent;
       cursor: default;
     }
-    .day-cell:not(.empty):active {
-      background: #e9ecef;
+    
+    /* ✨ 今日のおすすめハイライトデザイン */
+    .day-cell.today {
+      background: #fff9db;
+      border-color: #fcc419;
+    }
+    .day-cell.today .day-num {
+      background: #fcc419;
+      color: #fff !important;
+      border-radius: 4px;
+      padding: 0 4px;
     }
 
     .day-num {
       font-size: 11px;
       font-weight: 600;
       color: #333;
+      display: inline-block;
     }
     .day-cell.sunday .day-num { color: #dc3545; }
     .day-cell.saturday .day-num { color: #007bff; }
@@ -137,20 +148,31 @@
       text-overflow: ellipsis;
       position: absolute;
       top: 4px;
-      right: 4px;
+      right: 16px; /* コメントマークと重ならないように調整 */
       font-weight: bold;
+    }
+
+    /* 💬 コメントがある時の小さいマーク */
+    .comment-indicator {
+      position: absolute;
+      top: 4px;
+      right: 4px;
+      font-size: 9px;
     }
 
     .badge-container {
       width: 100%;
       margin-top: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 1px; /* 3つ綺麗に並ぶスキマ */
     }
 
     .badge {
-      font-size: 9px;
+      font-size: 8px;
       color: white;
-      padding: 1px 2px;
-      border-radius: 4px;
+      padding: 0px 2px;
+      border-radius: 3px;
       text-align: center;
       font-weight: bold;
       overflow: hidden;
@@ -158,62 +180,60 @@
       text-overflow: ellipsis;
       width: 100%;
       display: block;
-      animation: popIn 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
 
-    @keyframes popIn {
-      0% { transform: scale(0.6); opacity: 0; }
-      100% { transform: scale(1); opacity: 1; }
-    }
+    /* 🎨 6つの予定用のカラーバリエーション */
+    .bg-type1 { background-color: #007bff; }
+    .bg-type2 { background-color: #28a745; }
+    .bg-type3 { background-color: #dc3545; }
+    .bg-type4 { background-color: #fd7e14; }
+    .bg-type5 { background-color: #6f42c1; }
+    .bg-type6 { background-color: #17a2b8; }
 
-    .bg-kotonoha { background-color: #007bff; }
-    .bg-aiai { background-color: #28a745; }
-    .bg-yasumi { background-color: #dc3545; }
-
-    /* 下部：アイコン選択エリア */
+    /* 下部：アイコン選択エリア（6個用に2列配置に変更） */
     .dock {
       background: #f8f9fa;
       border-top: 1px solid #eee;
-      padding: 10px;
-      display: flex;
-      justify-content: space-around;
+      padding: 8px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
       gap: 6px;
     }
 
     .icon-btn {
-      flex: 1;
       border: 2px solid transparent;
       background: white;
-      padding: 8px 2px;
-      border-radius: 12px;
+      padding: 6px 2px;
+      border-radius: 10px;
       cursor: pointer;
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 4px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
-      transition: all 0.2s ease;
+      gap: 2px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
     }
 
     .icon-btn .dot {
-      width: 10px;
-      height: 10px;
+      width: 8px;
+      height: 8px;
       border-radius: 50%;
     }
 
     .icon-btn span {
-      font-size: 10px;
+      font-size: 9px;
       font-weight: bold;
       color: #555;
     }
 
     .icon-btn.active {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+      box-shadow: 0 3px 6px rgba(0,0,0,0.15);
     }
-    .icon-btn.active[data-type="kotonoha"] { border-color: #007bff; background: #f0f7ff; }
-    .icon-btn.active[data-type="aiai"] { border-color: #28a745; background: #f0f9f1; }
-    .icon-btn.active[data-type="yasumi"] { border-color: #dc3545; background: #fff5f5; }
+    .icon-btn.active[data-type="type1"] { border-color: #007bff; background: #f0f7ff; }
+    .icon-btn.active[data-type="type2"] { border-color: #28a745; background: #f0f9f1; }
+    .icon-btn.active[data-type="type3"] { border-color: #dc3545; background: #fff5f5; }
+    .icon-btn.active[data-type="type4"] { border-color: #fd7e14; background: #fff9f5; }
+    .icon-btn.active[data-type="type5"] { border-color: #6f42c1; background: #f8f5ff; }
+    .icon-btn.active[data-type="type6"] { border-color: #17a2b8; background: #f5fcff; }
   </style>
 </head>
 <body>
@@ -221,7 +241,7 @@
 <div class="app-container">
   <div class="header">
     <button class="nav-btn" id="prevMonth">◀</button>
-    <h2 id="monthTitle">2026年 7月</h2>
+    <h2 id="monthTitle">月</h2>
     <button class="nav-btn" id="nextMonth">▶</button>
   </div>
  
@@ -233,64 +253,66 @@
     <div class="days-grid" id="daysGrid"></div>
   </div>
 
-  <!-- 🔒 初期状態は「予定1〜3」にして個人情報をガード -->
+  <!-- 🔒 デフォルト「予定1〜6」にパワーアップ -->
   <div class="dock">
-    <button class="icon-btn active" data-type="kotonoha">
-      <div class="dot bg-kotonoha"></div>
-      <span>予定1</span>
+    <button class="icon-btn active" data-type="type1">
+      <div class="dot bg-type1"></div><span>予定1</span>
     </button>
-    <button class="icon-btn" data-type="aiai">
-      <div class="dot bg-aiai"></div>
-      <span>予定2</span>
+    <button class="icon-btn" data-type="type2">
+      <div class="dot bg-type2"></div><span>予定2</span>
     </button>
-    <button class="icon-btn" data-type="yasumi">
-      <div class="dot bg-yasumi"></div>
-      <span>予定3</span>
+    <button class="icon-btn" data-type="type3">
+      <div class="dot bg-type3"></div><span>予定3</span>
+    </button>
+    <button class="icon-btn" data-type="type4">
+      <div class="dot bg-type4"></div><span>予定4</span>
+    </button>
+    <button class="icon-btn" data-type="type5">
+      <div class="dot bg-type5"></div><span>予定5</span>
+    </button>
+    <button class="icon-btn" data-type="type6">
+      <div class="dot bg-type6"></div><span>予定6</span>
     </button>
   </div>
 </div>
 
-<!-- Firebaseのプログラム（仕組み）を読み込む -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
   import { getFirestore, doc, onSnapshot, setDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+  import { collection } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-  // -------------------------------------------------------------
-  // Firebase接続設定
-  // -------------------------------------------------------------
-  const firebaseConfig = {
-    apiKey: "AIzaSyA3a9hsSDIqgysl5wdsJy7EslUAnd-OYPs",
-    authDomain: "family-calendar-77e9e.firebaseapp.com",
-    projectId: "family-calendar-77e9e",
-    storageBucket: "family-calendar-77e9e.firebasestorage.app",
-    messagingSenderId: "483154113898",
-    appId: "1:483154113898:web:bd616fc68b34cc3f44a113"
-  };
+const firebaseConfig = {
+  apiKey: "AIzaSyArA9kbVhaPXpxLso_k_OYSGiUJrbVNaLI",
+  authDomain: "family-calendar-8bc65.firebaseapp.com",
+  projectId: "family-calendar-8bc65",
+  storageBucket: "family-calendar-8bc65.firebasestorage.app",
+  messagingSenderId: "530823961982",
+  appId: "1:530823961982:web:229f8308fb2a083a65e72f"
+};
 
-  // Firebaseの起動
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
 
-  // -------------------------------------------------------------
-  // 🔐 スマホ本体に項目名を記憶させる設定（デフォルトは予定1〜3）
-  // -------------------------------------------------------------
+  // 🔐 6つの予定をスマホ本体に記憶させる設定
   const scheduleMeta = {
-    kotonoha: { className: 'bg-kotonoha', label: localStorage.getItem('label-kotonoha') || '予定1' },
-    aiai: { className: 'bg-aiai', label: localStorage.getItem('label-aiai') || '予定2' },
-    yasumi: { className: 'bg-yasumi', label: localStorage.getItem('label-yasumi') || '予定3' }
+    type1: { className: 'bg-type1', label: localStorage.getItem('label-type1') || '予定1' },
+    type2: { className: 'bg-type2', label: localStorage.getItem('label-type2') || '予定2' },
+    type3: { className: 'bg-type3', label: localStorage.getItem('label-type3') || '予定3' },
+    type4: { className: 'bg-type4', label: localStorage.getItem('label-type4') || '予定4' },
+    type5: { className: 'bg-type5', label: localStorage.getItem('label-type5') || '予定5' },
+    type6: { className: 'bg-type6', label: localStorage.getItem('label-type6') || '予定6' }
   };
 
-  // ボタンの文字を最新の記憶に更新する関数
   function updateButtonLabels() {
-    document.querySelector('[data-type="kotonoha"] span').innerText = scheduleMeta.kotonoha.label;
-    document.querySelector('[data-type="aiai"] span').innerText = scheduleMeta.aiai.label;
-    document.querySelector('[data-type="yasumi"] span').innerText = scheduleMeta.yasumi.label;
+    Object.keys(scheduleMeta).forEach(key => {
+      const btn = document.querySelector(`[data-type="${key}"] span`);
+      if (btn) btn.innerText = scheduleMeta[key].label;
+    });
   }
 
-  // カレンダーの状態管理（※アプリ起動時の「現在の月」からスタートするように調整）
   let currentDate = new Date();
-  let currentType = 'kotonoha';
-  let savedEvents = {}; 
+  let currentType = 'type1';
+  let savedData = {}; // 予定とコメントを統合して管理
 
   // 祝日判定
   function getHolidayName(year, month, day) {
@@ -325,6 +347,7 @@
   function renderCalendar() {
     const year = currentDate.getFullYear();
     const month = currentDate.getMonth();
+    const today = new Date();
 
     document.getElementById('monthTitle').innerText = `${year}年 ${month + 1}月`;
     const daysGrid = document.getElementById('daysGrid');
@@ -347,94 +370,151 @@
       const dayOfWeek = dateObj.getDay();
       const holidayName = getHolidayName(year, month, day);
 
+      // ✨ 今日かどうかの判定
+      if (year === today.getFullYear() && month === today.getMonth() && day === today.getDate()) {
+        cell.classList.add('today');
+      }
+
       if (dayOfWeek === 0) cell.classList.add('sunday');
       if (dayOfWeek === 6) cell.classList.add('saturday');
       if (holidayName) cell.classList.add('holiday');
 
       let cellHTML = `<div class="day-num">${day}</div>`;
       if (holidayName) cellHTML += `<div class="holiday-name">${holidayName}</div>`;
+      
+      const dateKey = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+      
+      // 💬 コメントが入っている場合は小さい「💬マーク」を表示
+      if (savedData[dateKey] && savedData[dateKey].comment) {
+        cellHTML += `<div class="comment-indicator">💬</div>`;
+      }
+      
       cellHTML += `<div class="badge-container"></div>`;
       cell.innerHTML = cellHTML;
 
-      const dateKey = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
       const container = cell.querySelector('.badge-container');
+      const dayEvents = (savedData[dateKey] && savedData[dateKey].types) ? savedData[dateKey].types : [];
      
-      // 予定データがあれば最新の登録名で表示
-      if (savedEvents[dateKey]) {
-        const type = savedEvents[dateKey];
-        const badge = document.createElement('div');
-        badge.className = `badge ${scheduleMeta[type].className}`;
-        badge.innerText = scheduleMeta[type].label; // 記憶された名前を表示
-        container.appendChild(badge);
-      }
+      // 🔄 1日最大3つの予定バッジを表示
+      dayEvents.slice(0, 3).forEach(type => {
+        // 古いデータ名(kotonoha等)の互換性ケア
+        let mappedType = type;
+        if (type === 'kotonoha') mappedType = 'type1';
+        if (type === 'aiai') mappedType = 'type2';
+        if (type === 'yasumi') mappedType = 'type3';
 
-      // タップした時の処理（Firebaseにデータを保存/削除する）
-      cell.addEventListener('click', async () => {
-        const docRef = doc(db, "schedules", dateKey);
-        if (savedEvents[dateKey] === currentType) {
-          await deleteDoc(docRef);
-        } else {
-          await setDoc(docRef, { type: currentType });
+        if(scheduleMeta[mappedType]) {
+          const badge = document.createElement('div');
+          badge.className = `badge ${scheduleMeta[mappedType].className}`;
+          badge.innerText = scheduleMeta[mappedType].label;
+          container.appendChild(badge);
         }
       });
+
+      // 🔘 通常タップ時の処理：予定の付け外し（最大3個まで）
+      cell.addEventListener('click', async () => {
+        const docRef = doc(db, "schedules", dateKey);
+        let currentTypes = (savedData[dateKey] && savedData[dateKey].types) ? [...savedData[dateKey].types] : [];
+        let currentComment = (savedData[dateKey] && savedData[dateKey].comment) ? savedData[dateKey].comment : "";
+
+        if (currentTypes.includes(currentType)) {
+          // すでに存在すれば削除
+          currentTypes = currentTypes.filter(t => t !== currentType);
+        } else {
+          // 3つ未満なら新しく追加
+          if (currentTypes.length < 3) {
+            currentTypes.push(currentType);
+          } else {
+            alert("1日に入れられる予定は最大3つまでです");
+            return;
+          }
+        }
+
+        if (currentTypes.length === 0 && currentComment === "") {
+          await deleteDoc(docRef);
+        } else {
+          await setDoc(docRef, { types: currentTypes, comment: currentComment }, { merge: true });
+        }
+      });
+
+      // 💬 長押し判定の仕組み（スマホ＆PC対応）
+      let pressTimer;
+      const startPress = () => {
+        pressTimer = setTimeout(() => {
+          openCommentModal(dateKey);
+        }, 750); // 0.75秒長押しでコメント画面へ
+      };
+      const cancelPress = () => { clearTimeout(pressTimer); };
+
+      cell.addEventListener('mousedown', startPress);
+      cell.addEventListener('touchstart', startPress, { passive: true });
+      cell.addEventListener('mouseup', cancelPress);
+      cell.addEventListener('mouseleave', cancelPress);
+      cell.addEventListener('touchend', cancelPress);
 
       daysGrid.appendChild(cell);
     }
   }
 
-  // 🌟 リアルタイム同期（Firebaseからデータを自動受信）
-  onSnapshot(doc(db, "schedules", "all_events_realtime"), () => {}); 
- 
-  import { collection } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+  // 📝 コメントを入れる用のポップアップを開く関数
+  async function openCommentModal(dateKey) {
+    const currentComment = (savedData[dateKey] && savedData[dateKey].comment) ? savedData[dateKey].comment : "";
+    const newComment = prompt("この日のメモ・コメントを入力してください:\n(空欄にして確定すると削除されます)", currentComment);
+    
+    if (newComment !== null) {
+      const docRef = doc(db, "schedules", dateKey);
+      let currentTypes = (savedData[dateKey] && savedData[dateKey].types) ? savedData[dateKey].types : [];
+      
+      if (currentTypes.length === 0 && newComment.trim() === "") {
+        await deleteDoc(docRef);
+      } else {
+        await setDoc(docRef, { types: currentTypes, comment: newComment.trim() }, { merge: true });
+      }
+    }
+  }
+
+  // 🔄 Firebaseリアルタイム同期
   onSnapshot(collection(db, "schedules"), (snapshot) => {
-    savedEvents = {}; 
+    savedData = {}; 
     snapshot.forEach((doc) => {
-      savedEvents[doc.id] = doc.data().type; 
+      savedData[doc.id] = doc.data(); 
     });
     renderCalendar(); 
   });
 
-  // -------------------------------------------------------------
-  // 🔘 ボタン操作の設定 ＆ ダブルクリックによるカスタム機能
-  // -------------------------------------------------------------
-  // 初期化時にボタン名を更新
+  // 🔘 ボタン制御の初期設定
   updateButtonLabels();
 
-  // 前の月へボタン
   document.getElementById('prevMonth').addEventListener('click', () => {
     currentDate.setMonth(currentDate.getMonth() - 1);
     renderCalendar();
   });
 
-  // 次の月へボタン
   document.getElementById('nextMonth').addEventListener('click', () => {
     currentDate.setMonth(currentDate.getMonth() + 1);
     renderCalendar();
   });
 
-  // 下部ドックのボタン制御
   const buttons = document.querySelectorAll('.icon-btn');
   buttons.forEach(btn => {
     const type = btn.getAttribute('data-type');
 
-    // 通常タップ：選択状態を切り替える
     btn.addEventListener('click', () => {
       buttons.forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       currentType = type;
     });
 
-    // ダブルクリック（トントンと2回タップ）：そのスマホでの登録名を変更する
     btn.addEventListener('dblclick', (e) => {
-      e.stopPropagation(); // 通常タップとの重複をガード
+      e.stopPropagation();
       const currentName = scheduleMeta[type].label;
       const newName = prompt(`「${currentName}」の新しい項目名を入力してください：`, currentName);
       
       if (newName && newName.trim() !== "") {
-        scheduleMeta[type].label = newName;             // 一時保存
-        localStorage.setItem(`label-${type}`, newName); // スマホ本体に永続保存
-        updateButtonLabels();                           // ボタン表示を書き換え
-        renderCalendar();                               // カレンダー上の文字を再描画
+        scheduleMeta[type].label = newName;             
+        localStorage.setItem(`label-${type}`, newName); 
+        updateButtonLabels();                           
+        renderCalendar();                               
       }
     });
   });
