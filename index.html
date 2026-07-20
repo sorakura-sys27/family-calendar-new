@@ -131,6 +131,7 @@
       width: 100%;
       margin-bottom: 2px;
       line-height: 1.1;
+      pointer-events: none; /* クリック判定がセル全体に確実に行くようにする */
     }
 
     .day-top-row {
@@ -171,6 +172,7 @@
       display: flex;
       flex-direction: column;
       gap: 1px;
+      pointer-events: none; /* クリック判定をセルに通す */
     }
 
     .badge {
